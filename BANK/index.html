@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureBank Online Banking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🏦 SecureBank</h1>
+        <p>Your trusted online banking partner</p>
+    </div>
+
+    <div class="content">
+        <!-- Login Form -->
+        <div class="login-form active" id="loginSection">
+            <h2 style="margin-bottom: 10px; color: #333;">Welcome</h2>
+            <p style="color: #666; margin-bottom: 30px;">Please login to access your account</p>
+
+<!--            <div class="info-box">-->
+<!--                <p><strong>Demo Accounts:</strong></p>-->
+<!--                <p>Account 1: User ID: <strong>Ramsita</strong> | PIN: <strong>4317</strong></p>-->
+<!--                <p>Account 2: User ID: <strong>Lasri</strong> | PIN: <strong>5296</strong></p>-->
+<!--            </div>-->
+
+            <div id="loginError" class="error-msg"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>User Name</label>
+                    <input type="text" id="username" placeholder="Enter UserName" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter your Password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <p style="text-align: center; margin-top: 20px; color: #666;">
+                New here? <a href="#" onclick="showSignup(); return false;">Create an account</a>
+            </p>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="login-form" id="signupSection">
+            <h2 style="margin-bottom: 10px; color: #333;">Create Your Account</h2>
+            <p style="color: #666; margin-bottom: 30px;">Sign up to start banking online</p>
+
+            <div id="signupError" class="error-msg"></div>
+            <div id="signupSuccess" class="success-msg"></div>
+
+            <form id="signupForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signupUsername" placeholder="Enter user name" required>
+                </div>
+<!--                <div class="form-group">-->
+<!--                    <label>User ID</label>-->
+<!--                    <input type="text" id="signupUserId" placeholder="Choose a unique user ID" required>-->
+<!--                </div>-->
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signupPassword" placeholder="Create a strong password">
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Must contain: uppercase, lowercase, numbers & special characters (!@#$%^&*-_=+)
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Re-enter your password">
+                </div>
+<!--                <div class="form-group">-->
+<!--                    <label>Initial Deposit (₹)</label>-->
+<!--                    <input type="number" id="initialDeposit" placeholder="0.00" min="0" step="0.01" value="0">-->
+<!--                </div>-->
+                <button type="submit" class="btn">Create Account</button>
+            </form>
+
+            <p style="text-align: center; margin-top: 20px; color: #666;">
+                Already have an account? <a href="#" onclick="showLogin(); return false;">Log in</a>
+            </p>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="balance-card">
+                <h2>Available Balance</h2>
+                <div class="account-num" id="welcomeMessage"></div>
+                <div class="amount" id="balanceAmount">₹0.00</div>
+                <div class="account-num">Account: <span id="accountNumber"></span></div>
+<!--                <div class="account-num">Welcome, <span id="userName"></span>!</div>-->
+            </div>
+
+            <div class="actions">
+                <div class="action-btn" onclick="openModal('depositModal')">
+                    <h3>💰 Deposit</h3>
+                    <p>Add money to account</p>
+                </div>
+                <div class="action-btn" onclick="openModal('withdrawModal')">
+                    <h3>💳 Withdraw</h3>
+                    <p>Withdraw cash</p>
+                </div>
+                <div class="action-btn" onclick="openModal('transferModal')">
+                    <h3>🔄 Transfer</h3>
+                    <p>Send money</p>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
+
+            <div class="transactions">
+                <h3>Recent Transactions</h3>
+                <div id="transactionsList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deposit Modal -->
+<div id="depositModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Deposit Money</h2>
+        </div>
+        <div id="depositSuccess" class="success-msg"></div>
+        <div id="depositError" class="error-msg"></div>
+        <form id="depositForm">
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="depositAmount" placeholder="Enter amount" min="1" required>
+            </div>
+            <button type="submit" class="btn">Deposit</button>
+            <button type="button" class="close-btn" onclick="closeModal('depositModal')">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div id="withdrawModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Withdraw Money</h2>
+        </div>
+        <div id="withdrawSuccess" class="success-msg"></div>
+        <div id="withdrawError" class="error-msg"></div>
+        <form id="withdrawForm">
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="withdrawAmount" placeholder="Enter amount" min="1" required>
+            </div>
+            <button type="submit" class="btn">Withdraw</button>
+            <button type="button" class="close-btn" onclick="closeModal('withdrawModal')">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<!-- Transfer Modal -->
+<div id="transferModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Transfer Money</h2>
+        </div>
+        <div id="transferSuccess" class="success-msg"></div>
+        <div id="transferError" class="error-msg"></div>
+        <form id="transferForm">
+            <div class="form-group">
+                <label>Recipient Account</label>
+                <select id="recipientAccount" required>
+                    <option value="">Select account</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="transferAmount" placeholder="Enter amount" min="1" required>
+            </div>
+            <button type="submit" class="btn">Transfer</button>
+            <button type="button" class="close-btn" onclick="closeModal('transferModal')">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
