@@ -169,7 +169,7 @@ async function updateBalance() {
 // Update Transaction List
 async function updateTransactions() {
     try {
-        const res = await fetch(`${API_BASE}/api/transactions`, {
+        const res = await fetch(`${API_BASE}/transactions`, {
             headers: { 'Authorization': 'Bearer ' + authToken }
         });
         const transactions = await res.json();
