@@ -2,7 +2,7 @@
 let currentUser=localStorage.getItem('currentUser')||null;
 let authToken= localStorage.getItem('authToken')||null;
 let userName= localStorage.getItem('userName')||null;
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = 'https://online-banking-system-gfwy.onrender.com/api';
 
 // Toggle between Login and Signup forms
 function showSignup() {
@@ -63,7 +63,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     submitBtn.textContent = 'Creating account...';
 
     try {
-        const response = await fetch('http://localhost:8080/api/auth/register', {
+        const response = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -104,7 +104,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     hideMessage('loginError');
 
     try {
-        const response = await fetch('http://localhost:8080/api/auth/login', {
+        const response = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({userName:username, password:password})
@@ -154,7 +154,7 @@ async function showDashboard(userName,accountNumber) {
 // Update Balance Display
 async function updateBalance() {
     try {
-        const res = await fetch('http://localhost:8080/api/account', {
+        const res = await fetch(`${API_BASE}/account`, {
             headers: { 'Authorization': 'Bearer ' + authToken }
         });
         const data = await res.json();
@@ -169,7 +169,7 @@ async function updateBalance() {
 // Update Transaction List
 async function updateTransactions() {
     try {
-        const res = await fetch('http://localhost:8080/api/transactions', {
+        const res = await fetch(`${API_BASE}/api/transactions`, {
             headers: { 'Authorization': 'Bearer ' + authToken }
         });
         const transactions = await res.json();
@@ -207,7 +207,7 @@ async function updateTransactions() {
 async function updateTransferOptions() {
     console.log("updateTransferOptions called");
     try {
-        const res = await fetch('http://localhost:8080/api/users', {
+        const res = await fetch(`${API_BASE}/users`, {
             headers: { 'Authorization': 'Bearer ' + authToken }
         });
 
@@ -240,7 +240,7 @@ document.getElementById('depositForm').addEventListener('submit', async function
     }
 
     try {
-        const res = await fetch('http://localhost:8080/api/deposit', {
+        const res = await fetch(`${API_BASE}/deposit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
             body: JSON.stringify({ amount })
@@ -275,7 +275,7 @@ document.getElementById('withdrawForm').addEventListener('submit', async functio
     }
 
     try {
-        const res = await fetch(API_BASE + '/withdraw', {
+        const res = await fetch(`${API_BASE}/withdraw`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
             body: JSON.stringify({ amount })
@@ -317,7 +317,7 @@ document.getElementById('transferForm').addEventListener('submit', async functio
     }
 
     try {
-        const res = await fetch(API_BASE + '/transfer', {
+        const res = await fetch(`${API_BASE}/transfer`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
             body: JSON.stringify({ recipientid: recipientid, amount })
@@ -400,7 +400,7 @@ function logout() {
 window.addEventListener('DOMContentLoaded', async function() {
     if (authToken && currentUser) {
         try {
-            const res = await fetch('http://localhost:8080/api/account', {
+            const res = await fetch(`${API_BASE}/account`, {
                 headers: { 'Authorization': 'Bearer ' + authToken }
             });
             if (res.ok) {
