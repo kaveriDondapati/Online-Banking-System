@@ -1,21 +1,8 @@
 package com.Bank.Online.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins(
-                        "http://localhost:63342",
-                        "https://online-banking-system-frontend.onrender.com",
-                        "https://online-banking-system-2-i3mm.onrender.com"
-                )
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+public class WebConfig {
+    // CORS is configured only in SecurityConfig to avoid duplicate headers.
 }

@@ -86,6 +86,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
         const response = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'omit',
             body: JSON.stringify({
                 userName: username,
                 password: password,
@@ -127,6 +128,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         const response = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
+            credentials: 'omit',
             body: JSON.stringify({userName:username, password:password})
         });
 
@@ -146,7 +148,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             showMessage('loginError', data.error || 'Invalid username or password! Please try again.');
         }
     } catch (err) {
-        showMessage('loginError', 'Could not reach the server. Please make sure the backend is running.');
+        showMessage('loginError', 'Could not reach the server. If this is the first request, wait 30 seconds for Render to wake up and try again.');
     }
 });
 

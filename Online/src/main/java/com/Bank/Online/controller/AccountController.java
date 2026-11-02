@@ -48,4 +48,9 @@ public class AccountController {
     public ResponseEntity<List<UserSummary>> getOtherUsers(@AuthenticationPrincipal String id) {
         return ResponseEntity.ok(accountService.getOtherUsers(id));
     }
+
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("ok");
+    }
 }
