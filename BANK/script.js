@@ -2,7 +2,27 @@
 let currentUser=localStorage.getItem('currentUser')||null;
 let authToken= localStorage.getItem('authToken')||null;
 let userName= localStorage.getItem('userName')||null;
-const API_BASE = 'online-banking-system-2-i3mm.onrender.com/api';
+const API_BASE = normalizeApiBase('https://online-banking-system-67bt.onrender.com/api');
+
+function normalizeApiBase(value) {
+    let base = (value || '').trim();
+    if (!/^https?:\/\//i.test(base)) {
+        base = 'https://' + base.replace(/^\/+/, '');
+    }
+    return base.replace(/\/+$/, '');
+}
+
+async function parseJson(response) {
+    const text = await response.text();
+    if (!text) {
+        return {};
+    }
+    try {
+        return JSON.parse(text);
+    } catch (err) {
+        return { error: 'Unexpected response from server' };
+    }
+}
 
 // Toggle between Login and Signup forms
 function showSignup() {
@@ -74,7 +94,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
             })
         });
 
-        const data = await response.json();
+        const data = await parseJson(response);
 
         if (response.ok) {
             showMessage('signupSuccess', 'Account created! Account number: ' + (data.accountNumber || '') + '. Redirecting to login...');
@@ -110,15 +130,17 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             body: JSON.stringify({userName:username, password:password})
         });
 
-        const data = await response.json();
-        console.log(data);
+        const data = await parseJson(response);
 
         if (response.ok) {
+            if (!data.token) {
+                showMessage('loginError', 'Login did not return a token. The request did not hit the backend API.');
+                return;
+            }
             authToken = data.token;
             currentUser = data.userName;
             userName = data.userName;
             await showDashboard(data.userName, data.accountNumber);
-            //document.getElementById('accountNumber').textContent = accountNumber;
             document.getElementById('loginForm').reset();
         } else {
             showMessage('loginError', data.error || 'Invalid username or password! Please try again.');

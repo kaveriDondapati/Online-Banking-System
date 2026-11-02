@@ -9,7 +9,11 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:63342", "https://online-banking-system-frontend.onrender.com")
+                .allowedOrigins(
+                        "http://localhost:63342",
+                        "https://online-banking-system-frontend.onrender.com",
+                        "https://online-banking-system-2-i3mm.onrender.com"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
