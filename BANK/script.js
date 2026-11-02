@@ -35,6 +35,17 @@ function showLogin() {
     document.getElementById('loginSection').classList.add('active');
 }
 
+function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    if (!input) {
+        return;
+    }
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    button.classList.toggle('showing', show);
+    button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+}
+
 // Password Strength Validator
 function validatePasswordStrength(password) {
     const hasUpperCase = /[A-Z]/.test(password);

@@ -87,6 +87,53 @@ select:focus {
     border-color: #667eea;
 }
 
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 44px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    padding: 0;
+}
+
+.toggle-password:hover {
+    color: #667eea;
+}
+
+.toggle-password svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.toggle-password .icon-eye-off {
+    display: none;
+}
+
+.toggle-password.showing .icon-eye {
+    display: none;
+}
+
+.toggle-password.showing .icon-eye-off {
+    display: block;
+}
+
 /* Buttons */
 .btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

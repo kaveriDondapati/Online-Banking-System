@@ -34,7 +34,13 @@
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="password" placeholder="Enter your Password" required>
+                    <div class="password-field">
+                        <input type="password" id="password" placeholder="Enter your Password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password', this)" aria-label="Show password">
+                            <svg class="icon-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-5 0-9 5.5-9 7s4 7 9 7 9-5.5 9-7-4-7-9-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.3 4.3 3 21 19.7 19.7 21l-2.5-2.5A12.5 12.5 0 0 1 12 19c-5 0-9-5.5-9-7 0-.8 1.1-2.6 3-4.3L3 4.3zM12 7a5 5 0 0 1 5 5c0 .6-.1 1.2-.4 1.7L14.3 11A2.5 2.5 0 0 0 13 9.7L10.3 7.1C10.8 7 11.4 7 12 7zm9 5c0 .5-.4 1.4-1.1 2.4l-1.5-1.5c.4-.6.6-1 .6-.9 0-1.5-4-7-9-7-.6 0-1.2.1-1.8.2L6.7 3.7C8.3 3.2 10.1 3 12 3c5 0 9 5.5 9 7z"/></svg>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn">Login</button>
             </form>
@@ -63,14 +69,26 @@
 <!--                </div>-->
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="signupPassword" placeholder="Create a strong password">
+                    <div class="password-field">
+                        <input type="password" id="signupPassword" placeholder="Create a strong password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('signupPassword', this)" aria-label="Show password">
+                            <svg class="icon-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-5 0-9 5.5-9 7s4 7 9 7 9-5.5 9-7-4-7-9-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.3 4.3 3 21 19.7 19.7 21l-2.5-2.5A12.5 12.5 0 0 1 12 19c-5 0-9-5.5-9-7 0-.8 1.1-2.6 3-4.3L3 4.3zM12 7a5 5 0 0 1 5 5c0 .6-.1 1.2-.4 1.7L14.3 11A2.5 2.5 0 0 0 13 9.7L10.3 7.1C10.8 7 11.4 7 12 7zm9 5c0 .5-.4 1.4-1.1 2.4l-1.5-1.5c.4-.6.6-1 .6-.9 0-1.5-4-7-9-7-.6 0-1.2.1-1.8.2L6.7 3.7C8.3 3.2 10.1 3 12 3c5 0 9 5.5 9 7z"/></svg>
+                        </button>
+                    </div>
                     <small style="color: #666; margin-top: 5px; display: block;">
                         Must contain: uppercase, lowercase, numbers & special characters (!@#$%^&*-_=+)
                     </small>
                 </div>
                 <div class="form-group">
                     <label>Confirm Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Re-enter your password">
+                    <div class="password-field">
+                        <input type="password" id="confirmPassword" placeholder="Re-enter your password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)" aria-label="Show password">
+                            <svg class="icon-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-5 0-9 5.5-9 7s4 7 9 7 9-5.5 9-7-4-7-9-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.3 4.3 3 21 19.7 19.7 21l-2.5-2.5A12.5 12.5 0 0 1 12 19c-5 0-9-5.5-9-7 0-.8 1.1-2.6 3-4.3L3 4.3zM12 7a5 5 0 0 1 5 5c0 .6-.1 1.2-.4 1.7L14.3 11A2.5 2.5 0 0 0 13 9.7L10.3 7.1C10.8 7 11.4 7 12 7zm9 5c0 .5-.4 1.4-1.1 2.4l-1.5-1.5c.4-.6.6-1 .6-.9 0-1.5-4-7-9-7-.6 0-1.2.1-1.8.2L6.7 3.7C8.3 3.2 10.1 3 12 3c5 0 9 5.5 9 7z"/></svg>
+                        </button>
+                    </div>
                 </div>
 <!--                <div class="form-group">-->
 <!--                    <label>Initial Deposit (₹)</label>-->
@@ -182,6 +200,6 @@
     </div>
 </div>
 
-<script src="script.js?v=5"></script>
+<script src="script.js?v=6"></script>
 </body>
 </html>
