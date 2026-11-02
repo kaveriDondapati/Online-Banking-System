@@ -77,7 +77,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
         const data = await response.json();
 
         if (response.ok) {
-            showMessage('signupSuccess', 'Account created! Account number: ' + data.accountNumber + '. Redirecting to login...');
+            showMessage('signupSuccess', 'Account created! Account number: ' + (data.accountNumber || '') + '. Redirecting to login...');
             document.getElementById('signupForm').reset();
             setTimeout(function() {
                 showLogin();
@@ -114,11 +114,10 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         console.log(data);
 
         if (response.ok) {
-            localStorage.setItem("token",data.token);
             authToken = data.token;
             currentUser = data.userName;
-            //userName = data.name;
-            await showDashboard(data.userName,data.accountNumber);
+            userName = data.userName;
+            await showDashboard(data.userName, data.accountNumber);
             //document.getElementById('accountNumber').textContent = accountNumber;
             document.getElementById('loginForm').reset();
         } else {
@@ -129,26 +128,47 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     }
 });
 
-// Show Dashboard after successful login
-async function showDashboard(userName,accountNumber) {
+function pageUrl(page) {
+    return window.location.pathname + window.location.search + (page === 'dashboard' ? '#dashboard' : '#login');
+}
 
+function showLoginPage() {
+    ['depositModal', 'withdrawModal', 'transferModal'].forEach(function(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    });
+    document.querySelector('.dashboard').classList.remove('active');
+    document.getElementById('signupSection').classList.remove('active');
+    document.getElementById('loginSection').classList.add('active');
+    document.getElementById('loginForm').reset();
+    hideMessage('loginError');
+}
+
+function lockBackButtonToLogin() {
+    history.replaceState({ page: 'login' }, '', pageUrl('login'));
+    history.pushState({ page: 'dashboard' }, '', pageUrl('dashboard'));
+}
+
+// Show Dashboard after successful login
+async function showDashboard(userName, accountNumber) {
     document.getElementById('loginSection').classList.remove('active');
     document.getElementById('signupSection').classList.remove('active');
     document.querySelector('.dashboard').classList.add('active');
-
 
     localStorage.setItem('currentUser', userName);
     localStorage.setItem('authToken', authToken);
     localStorage.setItem('userName', userName);
 
-    // Update welcome message with user's name
     document.getElementById('welcomeMessage').textContent = 'Welcome, ' + userName + '! 👋';
     document.getElementById('accountNumber').textContent = accountNumber;
+
+    lockBackButtonToLogin();
 
     await updateBalance();
     await updateTransactions();
     await updateTransferOptions();
-
 }
 
 // Update Balance Display
@@ -158,9 +178,11 @@ async function updateBalance() {
             headers: { 'Authorization': 'Bearer ' + authToken }
         });
         const data = await res.json();
-        document.getElementById('balanceAmount').textContent = '₹' + data.balance.toFixed(2);
-        document.getElementById("accountNumber").textContent =
-            data.accountNumber;
+        const balance = Number(data.balance || 0);
+        document.getElementById('balanceAmount').textContent = '₹' + balance.toFixed(2);
+        if (data.accountNumber) {
+            document.getElementById('accountNumber').textContent = data.accountNumber;
+        }
     } catch (err) {
         console.error('Error updating balance:', err);
     }
@@ -175,24 +197,29 @@ async function updateTransactions() {
         const transactions = await res.json();
         const list = document.getElementById('transactionsList');
 
-        if (transactions.length === 0) {
+        if (!Array.isArray(transactions) || transactions.length === 0) {
             list.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No transactions yet</p>';
             return;
         }
 
         list.innerHTML = '';
-        // Show transactions in reverse order (newest first)
-        transactions.slice().reverse().forEach(function(t) {
+        transactions.forEach(function(t) {
             const item = document.createElement('div');
             item.className = 'transaction-item';
 
+            const type = (t.type || '').trim();
+            const dateValue = t.createdAt || t.date || '';
+            const amountValue = Number(t.amount);
+
             const info = document.createElement('div');
             info.className = 'transaction-info';
-            info.innerHTML = '<h4>' + t.type + '</h4><p>' + t.date + '</p>';
+            const party = t.counterpartyName && t.counterpartyName !== 'self' ? ' · ' + t.counterpartyName : '';
+            info.innerHTML = '<h4>' + type + party + '</h4><p>' + formatDate(dateValue) + '</p>';
 
             const amount = document.createElement('div');
-            amount.className = 'transaction-amount ' + (t.type === 'Deposit' || t.type === 'Received' ? 'credit' : 'debit');
-            amount.textContent = (t.type === 'Deposit' || t.type === 'Received' ? '+' : '-') + '₹' + t.amount.toFixed(2);
+            const isCredit = type === 'Deposit' || type === 'Received';
+            amount.className = 'transaction-amount ' + (isCredit ? 'credit' : 'debit');
+            amount.textContent = (isCredit ? '+' : '-') + '₹' + amountValue.toFixed(2);
 
             item.appendChild(info);
             item.appendChild(amount);
@@ -212,11 +239,13 @@ async function updateTransferOptions() {
         });
 
         console.log("Status:",res.status);
-        const otherUsers=await res.json();
-        console.log("Users:",otherUsers);
-
+        const otherUsers = await res.json();
         const select = document.getElementById('recipientAccount');
         select.innerHTML = '<option value="">Select account</option>';
+
+        if (!Array.isArray(otherUsers)) {
+            return;
+        }
 
         otherUsers.forEach(function(u) {
             const option = document.createElement('option');
@@ -253,9 +282,8 @@ document.getElementById('depositForm').addEventListener('submit', async function
             document.getElementById('depositForm').reset();
             setTimeout(function() { closeModal('depositModal'); }, 2000);
         } else {
-            const message = await res.text();
-            console.log(message);
-            showMessage('depositError', message);
+            const data = await res.json();
+            showMessage('depositError', data.error || 'Deposit failed. Please try again.');
         }
     } catch (err) {
         showMessage('depositError', 'Error: ' + err.message);
@@ -367,6 +395,17 @@ function closeModal(modalId) {
     });
 }
 
+function formatDate(value) {
+    if (!value) {
+        return '';
+    }
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+        return String(value);
+    }
+    return parsed.toLocaleString();
+}
+
 // Show Message
 function showMessage(elementId, message) {
     const element = document.getElementById(elementId);
@@ -381,33 +420,55 @@ function showMessage(elementId, message) {
 // Hide Message
 function hideMessage(elementId) {
     const element = document.getElementById(elementId);
-    element.classList.remove('active');
+    if (element) {
+        element.classList.remove('active');
+    }
 }
 
-// Logout Function
-function logout() {
+function logout(options) {
+    options = options || {};
     currentUser = null;
     authToken = null;
     userName = null;
-    localStorage.clear();
-    document.querySelector('.dashboard').classList.remove('active');
-    document.getElementById('signupSection').classList.add('active');
-    document.getElementById('loginSection').classList.add('active');
-    document.getElementById('loginForm').reset();
-    hideMessage('loginError');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('token');
+    showLoginPage();
+    if (!options.fromHistory) {
+        history.replaceState({ page: 'login' }, '', pageUrl('login'));
+    }
 }
-// Add at the end of your JavaScript file
+
+function leaveDashboardForLogin() {
+    if (!document.querySelector('.dashboard').classList.contains('active')) {
+        return;
+    }
+    logout({ fromHistory: true });
+    history.replaceState({ page: 'login' }, '', pageUrl('login'));
+}
+
+window.addEventListener('popstate', function() {
+    leaveDashboardForLogin();
+});
+
+window.addEventListener('hashchange', function() {
+    if (window.location.hash !== '#dashboard') {
+        leaveDashboardForLogin();
+    }
+});
+
 window.addEventListener('DOMContentLoaded', async function() {
+    history.replaceState({ page: 'login' }, '', pageUrl('login'));
+
     if (authToken && currentUser) {
         try {
             const res = await fetch(`${API_BASE}/account`, {
                 headers: { 'Authorization': 'Bearer ' + authToken }
             });
             if (res.ok) {
-                // Token is still valid, restore dashboard
                 await showDashboard(userName, document.getElementById('accountNumber')?.textContent || '');
             } else {
-                // Token expired, clear and show login
                 logout();
             }
         } catch (err) {

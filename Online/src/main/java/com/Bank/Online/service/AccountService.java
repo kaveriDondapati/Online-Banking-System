@@ -10,16 +10,13 @@ import com.Bank.Online.model.users;
 import com.Bank.Online.repository.TransactionRepository;
 import com.Bank.Online.repository.userRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.Bank.Online.service.JwtService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,9 +34,8 @@ public class AccountService {
         t.setUser(user);
         t.setType("Deposit");
         t.setAmount(amount);
-        t.setCounterpartyName(null);
+        t.setCounterpartyName("self");
         t.setCreatedAt(LocalDateTime.now());
-
         transactionRepo.save(t);
     }
 
@@ -50,23 +46,26 @@ public class AccountService {
             throw new InsufficientBalanceException(user.getBalance());
         }
         user.setBalance(user.getBalance().subtract(amount));
-        transactionRepo.save(new Transactions(null, user, "Withdrawal", amount, null, LocalDateTime.now()));
+        transactionRepo.save(new Transactions(null, user, "Withdrawal", amount, "self", LocalDateTime.now()));
     }
 
     @Transactional
     public void transfer(String senderid, String recipientid, BigDecimal amount) {
         users sender = userRepo.findById(Integer.parseInt(senderid)).orElseThrow();
-        users recipient = userRepo.findByAccountNumber(recipientid).orElseThrow(() -> new RecipientNotFoundException(recipientid));
+        users recipient = userRepo.findByAccountNumber(recipientid)
+                .orElseThrow(() -> new RecipientNotFoundException(recipientid));
 
+        if (sender.getId() == recipient.getId()) {
+            throw new IllegalArgumentException("Cannot transfer to your own account");
+        }
         if (amount.compareTo(sender.getBalance()) > 0) {
             throw new InsufficientBalanceException(sender.getBalance());
         }
         sender.setBalance(sender.getBalance().subtract(amount));
         recipient.setBalance(recipient.getBalance().add(amount));
 
-        transactionRepo.save(new Transactions(null, sender, "Transfer to" + recipient.getUserName(), amount, recipient.getUserName(), LocalDateTime.now()));
-        transactionRepo.save(new Transactions(null, recipient, "Received from" + sender.getUserName(), amount, sender.getUserName(), LocalDateTime.now()));
-
+        transactionRepo.save(new Transactions(null, sender, "Transfer", amount, recipient.getUserName(), LocalDateTime.now()));
+        transactionRepo.save(new Transactions(null, recipient, "Received", amount, sender.getUserName(), LocalDateTime.now()));
     }
 
     public AccountResponse getAccount(String id) {
@@ -82,25 +81,21 @@ public class AccountService {
                 .toList();
     }
 
-    public List<UserSummary> getOtherUsers(String currentUsername) {
+    public List<UserSummary> getOtherUsers(String currentUserId) {
+        int id = Integer.parseInt(currentUserId);
         return userRepo.findAll().stream()
-                .filter(u -> !u.getUserName().equals(currentUsername))
+                .filter(u -> u.getId() != id)
                 .map(u -> new UserSummary(u.getUserName(), u.getAccountNumber(), u.getBalance()))
                 .toList();
     }
 
     public RegisterResponse register(String userName, String password, String confirmPassword) {
-        System.out.println("Username = " + userName);
-        System.out.println("Password = " + password);
-        System.out.println("Confirm Password = " + confirmPassword);
-
         if (!password.equals(confirmPassword)) {
-            throw new IllegalArgumentException("Password do not match");
+            throw new IllegalArgumentException("Passwords do not match");
         }
         if (userRepo.findByUserName(userName).isPresent()) {
             throw new UserIdAlreadyExistsException("Username already exists");
         }
-
 
         users user = new users();
         user.setUserName(userName);
@@ -110,8 +105,7 @@ public class AccountService {
         user.setBalance(BigDecimal.ZERO);
 
         userRepo.save(user);
-        return new RegisterResponse(user.getUserName(),
-                user.getPassword(), user.getConfirmPassword());
+        return new RegisterResponse(user.getUserName(), user.getAccountNumber());
     }
 
     public LoginResponse login(String userName, String password) {
@@ -130,5 +124,3 @@ public class AccountService {
         return String.valueOf(number);
     }
 }
-
-

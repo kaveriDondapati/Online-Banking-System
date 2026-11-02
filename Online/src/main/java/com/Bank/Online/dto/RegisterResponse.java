@@ -1,9 +1,7 @@
 package com.Bank.Online.dto;
 
 public record RegisterResponse(
-
         String userName,
-        String password,
-        String confirmPassword
+        String accountNumber
 ) {
 }
