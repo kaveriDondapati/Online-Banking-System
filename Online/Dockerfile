@@ -5,7 +5,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn -B clean package -DskipTests
+# Unique layer so Render cannot reuse a stale cached JAR
+RUN mvn -B clean package -DskipTests -DbuildId=20261102c
 
 FROM eclipse-temurin:21-jre
 
