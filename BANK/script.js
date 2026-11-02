@@ -2,7 +2,7 @@
 let currentUser=localStorage.getItem('currentUser')||null;
 let authToken= localStorage.getItem('authToken')||null;
 let userName= localStorage.getItem('userName')||null;
-const API_BASE = 'https://online-banking-system-gfwy.onrender.com/api';
+const API_BASE = 'https://online-banking-system-67bt.onrender.com/api';
 
 // Toggle between Login and Signup forms
 function showSignup() {
